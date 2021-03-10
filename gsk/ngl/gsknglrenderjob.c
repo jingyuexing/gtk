@@ -1645,8 +1645,9 @@ gsk_ngl_render_job_visit_rounded_color_node (GskNglRenderJob     *job,
   graphene_rect_t inner;
   graphene_rect_t rect;
 
-  outer = &clip->bounds;
+  outer = &node->bounds;
   rounded_rect_get_inner (clip, &inner);
+  graphene_rect_intersection (outer, &inner, &inner);
 
   gsk_ngl_render_job_begin_draw (job, job->driver->color);
   gsk_ngl_program_set_uniform_color (job->current_program,
@@ -1735,8 +1736,7 @@ gsk_ngl_render_job_visit_rounded_clip_node (GskNglRenderJob     *job,
     }
 
   if (gsk_render_node_get_node_type (child) == GSK_COLOR_NODE &&
-      job->current_clip->is_fully_contained &&
-      graphene_rect_equal (&clip->bounds, &child->bounds))
+      job->current_clip->is_fully_contained)
     {
       /* special-case CSS backgrounds */
       gsk_ngl_render_job_push_clip (job, &transformed_clip);
